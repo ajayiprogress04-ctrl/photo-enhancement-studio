@@ -1,0 +1,114 @@
+﻿I have uploaded a ZIP file containing multiple photographs. Please carefully process and enhance EVERY image individually.
+
+Your goal is to make each photograph look as though it was captured using a premium, high-end professional camera and professionally edited by an expert photographer.
+
+IMPORTANT: This is an IMAGE ENHANCEMENT and PROFESSIONAL COLOR-CORRECTION task, NOT an image transformation task.
+
+For every photograph, apply intelligent, natural-looking professional enhancements where necessary:
+
+1. Preserve Identity Completely
+
+- Do NOT change, regenerate, replace, beautify, or alter anyone's face.
+- Do NOT modify facial structure, skin tone, eyes, nose, lips, hairstyle, body shape, age, ethnicity, or identifying characteristics.
+- Every person must remain immediately recognizable and authentically identical to the original photograph.
+- Do NOT apply AI beauty filters or artificial facial smoothing.
+- Preserve natural skin texture and realistic details.
+
+2. Professional Image Quality Enhancement
+
+Enhance each image appropriately by improving:
+
+- Sharpness and fine detail
+- Overall clarity
+- Natural high-resolution appearance
+- Focus quality where possible
+- Texture preservation
+- Noise reduction where necessary
+- Exposure balance
+- Dynamic range
+- Highlight recovery
+- Shadow recovery
+- Contrast
+- White balance
+
+Do not oversharpen or create artificial-looking details.
+
+3. Premium Professional Color Grading
+
+Apply natural, sophisticated, professional color correction:
+
+- Correct inaccurate color casts
+- Improve color balance and harmony
+- Make colors rich but realistic
+- Enhance vibrancy subtly without oversaturation
+- Preserve accurate and natural skin tones
+- Create clean, premium, high-end camera color rendering
+
+The final result should look polished and cinematic where appropriate, but NEVER excessively filtered or unnatural.
+
+4. Intelligent Photo-by-Photo Editing
+
+Analyze EVERY photograph individually before editing.
+
+Do NOT apply exactly the same settings blindly to all images. Adapt the enhancement based on the lighting conditions, environment, exposure, and quality of each individual photograph.
+
+Correct any visible issues where possible, including:
+
+- Poor exposure
+- Dull lighting
+- Excessive shadows
+- Blown-out highlights
+- Color imbalance
+- Camera noise or grain
+- Slight softness
+- Reduced clarity
+- Uneven lighting
+
+5. Preserve the Original Scene
+
+Do NOT change:
+
+- People's identities or faces
+- Clothing
+- Body proportions
+- Pose
+- Background composition
+- Objects
+- Location
+- Event context
+- Original photographic moment
+
+Do not add fictional objects or dramatically alter the scene.
+
+6. Natural Professional Finish
+
+The final photographs should look:
+
+- Authentic
+- Elegant
+- Clean
+- Sharp
+- Professionally color-corrected
+- Naturally detailed
+- Premium
+- High-end
+- Realistic
+
+The desired aesthetic is comparable to photographs captured with a top-tier professional full-frame camera and carefully processed by a skilled professional photographer—not heavily filtered AI-generated images.
+
+FINAL QUALITY CONTROL
+
+Before finalizing each image, check that:
+
+1. The person's identity has NOT changed.
+2. Faces remain authentic and recognizable.
+3. Skin texture remains natural.
+4. Colors look realistic and professionally balanced.
+5. Sharpness is improved without artificial artifacts.
+6. Lighting and exposure look natural.
+7. No unnecessary objects or scene changes have been introduced.
+8. The image looks significantly more polished while still looking like the ORIGINAL photograph.
+
+Process EVERY photograph in the uploaded ZIP folder.
+
+Return the enhanced photographs at the highest practical quality and resolution possible, while preserving the original aspect ratio and composition of each image.
