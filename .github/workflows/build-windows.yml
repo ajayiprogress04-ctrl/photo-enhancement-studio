@@ -17,19 +17,46 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install Python dependencies
+        shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
+          python -m pip install -r requirements.txt
+          python -m pip install pyinstaller
 
-      - name: Build Windows executable
+      - name: Build Windows application
+        shell: pwsh
         run: |
           pyinstaller --noconfirm --clean --windowed --onedir --name "PhotoEnhancementStudio" --collect-all PySide6 --collect-all cv2 main.py
 
-      - name: Upload application artifact
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+
+      - name: Compile Windows installer
+        shell: pwsh
+        run: |
+          $compiler = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $compiler)) {
+            throw "Inno Setup compiler not found."
+          }
+          & $compiler installer.iss
+          if ($LASTEXITCODE -ne 0) {
+            throw "Installer compilation failed."
+          }
+
+      - name: Upload portable application
         uses: actions/upload-artifact@v4
         with:
-          name: PhotoEnhancementStudio-Windows
+          name: PhotoEnhancementStudio-Portable
           path: dist/PhotoEnhancementStudio/
+          if-no-files-found: error
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhotoEnhancementStudio-Installer
+          path: |
+            dist/installer/*.exe
+            Output/*.exe
           if-no-files-found: error
