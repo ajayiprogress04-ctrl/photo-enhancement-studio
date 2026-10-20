@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    name: Build Windows Application and Installer
     runs-on: windows-latest
 
     steps:
@@ -24,39 +25,104 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install pyinstaller
 
+      - name: Run automated tests
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -v
+
       - name: Build Windows application
         shell: pwsh
         run: |
-          pyinstaller --noconfirm --clean --windowed --onedir --name "PhotoEnhancementStudio" --collect-all PySide6 --collect-all cv2 main.py
+          pyinstaller `
+            --noconfirm `
+            --clean `
+            --windowed `
+            --onedir `
+            --name "PhotoEnhancementStudio" `
+            --collect-all PySide6 `
+            --collect-all cv2 `
+            main.py
+
+          $exe = "dist/PhotoEnhancementStudio/PhotoEnhancementStudio.exe"
+
+          if (-not (Test-Path $exe)) {
+            throw "Windows application executable not found."
+          }
+
+          Write-Host "Windows application built successfully."
 
       - name: Install Inno Setup
         shell: pwsh
-        run: choco install innosetup --yes --no-progress
+        run: |
+          choco install innosetup --yes --no-progress
+
+          $compiler = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+
+          if (-not (Test-Path $compiler)) {
+            throw "Inno Setup compiler not found."
+          }
+
+          Write-Host "Inno Setup installed successfully."
 
       - name: Compile Windows installer
         shell: pwsh
         run: |
           $compiler = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
-          if (-not (Test-Path $compiler)) {
-            throw "Inno Setup compiler not found."
-          }
-          & $compiler installer.iss
-          if ($LASTEXITCODE -ne 0) {
-            throw "Installer compilation failed."
+
+          if (-not (Test-Path "installer.iss")) {
+            throw "installer.iss was not found."
           }
 
-      - name: Upload portable application
+          New-Item -ItemType Directory -Force -Path release |
+            Out-Null
+
+          & $compiler `
+            "/O$((Resolve-Path release).Path)" `
+            "/FPhotoEnhancementStudio_Setup" `
+            "installer.iss"
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Inno Setup compilation failed."
+          }
+
+          $installer = "release/PhotoEnhancementStudio_Setup.exe"
+
+          if (-not (Test-Path $installer)) {
+            throw "Installer executable was not generated."
+          }
+
+          Write-Host "Installer created successfully."
+
+      - name: Verify installer
+        shell: pwsh
+        run: |
+          $installer = "release/PhotoEnhancementStudio_Setup.exe"
+
+          $file = Get-Item $installer
+
+          if ($file.Length -le 0) {
+            throw "Installer file is empty."
+          }
+
+          Write-Host "Installer filename: $($file.Name)"
+          Write-Host "Installer size: $($file.Length) bytes"
+
+          $hash = Get-FileHash $installer -Algorithm SHA256
+
+          Write-Host "SHA256: $($hash.Hash)"
+
+      - name: Upload portable Windows application
         uses: actions/upload-artifact@v4
         with:
           name: PhotoEnhancementStudio-Portable
           path: dist/PhotoEnhancementStudio/
           if-no-files-found: error
+          retention-days: 30
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: PhotoEnhancementStudio-Installer
-          path: |
-            dist/installer/*.exe
-            Output/*.exe
+          path: release/PhotoEnhancementStudio_Setup.exe
           if-no-files-found: error
+          retention-days: 30
