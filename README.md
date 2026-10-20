@@ -46,3 +46,9 @@ Note: The project ZIP is source code, **not** a precompiled Windows installer. B
 
 ## Design adaptations
 Light/Dark/Colour themes use deep burgundy accents and compact layouts. The desktop uses Qt controls rather than the web reference's CSS; preferred fonts are used when installed and fall back to system fonts. Educational-only rules and website sharing controls are intentionally excluded.
+
+## Version 0.2.0 — Premium photographic correction
+
+Adds three non-generative presets: Natural Professional, Premium Camera Look (default), and Cinematic Professional. The per-image pipeline includes restrained white balance, adaptive tonal correction, highlight roll-off, shadow lift, subtle color grading, conditional noise suppression and sharpening. Strength 0 leaves pixels unchanged (after EXIF orientation and RGB conversion). The selected preset applies to preview and batch exports and is saved locally.
+
+**Limitations:** This is *not* generative AI, learned super-resolution, face reconstruction or genuine restoration of clipped highlights. It cannot guarantee a professional-camera appearance for every input. Test visually on real photos before distributing. No cloud service or network access is used by the processing engine.

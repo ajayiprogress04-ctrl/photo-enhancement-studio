@@ -10,7 +10,7 @@ from PySide6.QtGui import QPixmap, QImage
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QListWidget, QFileDialog, QComboBox, QSlider, QProgressBar,
     QSplitter, QMessageBox, QCheckBox)
-from studio.engine import enhance, save_image
+from studio.engine import enhance, save_image, PRESETS
 from studio.io import collect
 
 CONFIG = Path.home() / '.photo_enhancement_studio.json'
@@ -23,8 +23,8 @@ class BatchWorker(QThread):
     progress = Signal(int, str)
     completed = Signal(str)
     failed = Signal(str)
-    def __init__(self, paths, destination, strength, as_zip):
-        super().__init__(); self.paths=paths; self.destination=Path(destination); self.strength=strength; self.as_zip=as_zip
+    def __init__(self, paths, destination, strength, as_zip, preset):
+        super().__init__(); self.paths=paths; self.destination=Path(destination); self.strength=strength; self.as_zip=as_zip; self.preset=preset
     def run(self):
         try:
             folder = self.destination if not self.as_zip else Path(tempfile.mkdtemp(prefix='pes_export_'))
@@ -32,7 +32,7 @@ class BatchWorker(QThread):
             used = set()
             for idx, path in enumerate(self.paths):
                 with Image.open(path) as src:
-                    edited = enhance(src, self.strength)
+                    edited = enhance(src, self.strength, self.preset)
                 stem = path.stem
                 name = f'{stem}_enhanced.jpg'
                 if name.lower() in used:
@@ -80,6 +80,9 @@ class Window(QMainWindow):
             column=QVBoxLayout(); column.addWidget(QLabel(heading)); widget.setAlignment(Qt.AlignCenter)
             widget.setMinimumSize(250,260); widget.setStyleSheet('border: 1px solid #777777; border-radius: 7px;')
             column.addWidget(widget,1); previews.addLayout(column,1)
+        right_layout.addWidget(QLabel('Photographic finish'))
+        self.preset=QComboBox(); self.preset.addItems(PRESETS); self.preset.setCurrentText(self.settings.get('preset', 'Premium Camera Look'))
+        self.preset.currentTextChanged.connect(self.preview_current); self.preset.currentTextChanged.connect(self.save_settings); right_layout.addWidget(self.preset)
         right_layout.addWidget(QLabel('Enhancement strength'))
         self.strength=QSlider(Qt.Horizontal); self.strength.setRange(0,100); self.strength.setValue(65)
         self.strength.valueChanged.connect(self.preview_current); right_layout.addWidget(self.strength)
@@ -96,7 +99,9 @@ class Window(QMainWindow):
           QListWidget,QComboBox{{background:{surface};color:{fg};border:1px solid {border};border-radius:6px;padding:5px;}}
           QProgressBar{{border:1px solid {border};border-radius:5px;text-align:center;}}
           QProgressBar::chunk{{background:{accent};}}''')
-        CONFIG.write_text(json.dumps({'theme':name}),encoding='utf-8')
+        self.save_settings()
+    def save_settings(self, *_):
+        CONFIG.write_text(json.dumps({'theme': self.theme.currentText(), 'preset': self.preset.currentText()}), encoding='utf-8')
     def add_files(self):
         files,_=QFileDialog.getOpenFileNames(self,'Import photographs or ZIP','','Images and archives (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.webp *.zip)')
         if files: self.import_paths(files)
@@ -120,7 +125,7 @@ class Window(QMainWindow):
             from PIL import ImageOps
             with Image.open(self.paths[idx]) as source:
                 original=ImageOps.exif_transpose(source).convert('RGB'); original.thumbnail((720,720))
-            corrected=enhance(original,self.strength.value()/100)
+            corrected=enhance(original,self.strength.value()/100,self.preset.currentText())
             for im,widget in [(original,self.original),(corrected,self.edited)]:
                 data=im.tobytes('raw','RGB'); q=QImage(data,im.width,im.height,im.width*3,QImage.Format_RGB888)
                 widget.setPixmap(QPixmap.fromImage(q.copy()).scaled(widget.size(),Qt.KeepAspectRatio,Qt.SmoothTransformation))
@@ -136,7 +141,7 @@ class Window(QMainWindow):
         if as_zip: dest,_=QFileDialog.getSaveFileName(self,'Save ZIP','enhanced_photos.zip','ZIP archive (*.zip)')
         else: dest=QFileDialog.getExistingDirectory(self,'Choose export folder')
         if not dest: return
-        self.worker=BatchWorker(self.paths,dest,self.strength.value()/100,as_zip)
+        self.worker=BatchWorker(self.paths,dest,self.strength.value()/100,as_zip,self.preset.currentText())
         self.worker.progress.connect(lambda n,name:(self.progress.setValue(n),self.status.setText(f'Processing {name}')))
         self.worker.completed.connect(lambda output:(self.status.setText(f'Export complete: {output}'),QMessageBox.information(self,'Complete',f'Enhanced photographs saved to:\n{output}')))
         self.worker.failed.connect(lambda err:QMessageBox.critical(self,'Export failed',err))
